@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>jjjj.bet</title>
+    <style>
+      
+        :root {
+            --scale: 1;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            background-color: black;
+            overflow: hidden; /* 防止浏览器出现滚动条 */
+            /*width: 100%;
+            height: 100%;*/
+        }
+
+        .iframe-home-img {
+            z-index: 9000;
+            display: block;
+            position: absolute;
+            top: 1%;
+            left: 1%;
+            background: transparent;
+            width: 98px;
+            height: 98px;
+            cursor: pointer; /* 添加鼠标样式 */
+            background-image: url('./ui_an_lobby1.png'); /* 设置图片作为背景 */
+            background-size: cover; /* 确保图片填满按钮 */
+            background-position: center; /* 图片居中显示 */
+            border: none; /* 去除按钮边框 */
+        }
+
+        .iframe-home-img-phone {
+            z-index: 9000;
+            display: block;
+            position: absolute;
+            top: 1%;
+            left: 1%;
+            background: transparent;
+            width: 55px;
+            height: 55px;
+            cursor: pointer; /* 添加鼠标样式 */
+            background-image: url('./ui_an_lobby1.png'); /* 设置图片作为背景 */
+            background-size: cover;
+            background-position: center;
+            border: none;
+            -webkit-tap-highlight-color: transparent; /* 禁用点击时的高亮效果 */
+        }
+
+       /* .button {
+            position: absolute;
+            width: 100px;
+            height: 124px;
+            background: transparent;
+            border: 0;
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .button img {
+                max-width: 50%;
+                max-height: 50%;
+            }*/
+
+        #img-home-iframe {
+            top: 1%;
+            left: 1%;
+        }
+
+        #img-home-iframe-phone {
+            top: 1%;
+            left: 1%;
+        }
+
+        /* 取消按钮点击时的默认样式 */
+        button:active, button:focus {
+            outline: none; /* 取消点击时的轮廓框 */
+            background-color: transparent; /* 只去除背景色，不影响背景图片 */
+            box-shadow: none; /* 取消阴影效果 */
+        }
+
+
+    </style>
+
+    <link rel="preload" href="./ui_an_lobby1.png" as="image">
+</head>
+<body>
+    <button id="img-home-iframe" class="iframe-home-img">
+    </button> 
+    <button id="img-home-iframe-phone" class="iframe-home-img-phone">
+    </button>
+
+
+    <script>
+
+        // pc端按钮移动事件
+        function makeDraggable(element) {
+            let offsetX = 0, offsetY = 0;
+            let isDragging = false;
+            let isClicking = true;  // 用于判断是否为点击操作
+            const safetyDistance = 10; // 安全距离，单位为像素
+
+            element.addEventListener('mousedown', function (e) {
+                if (e.button === 0) {  // 确保是鼠标左键按下
+                    logger("mousedown");
+                    offsetX = e.clientX - element.getBoundingClientRect().left;
+                    offsetY = e.clientY - element.getBoundingClientRect().top;
+                    isClicking = true;  // 假设是点击操作 Assume it's a click initially
+                    isDragging = false;  // Reset dragging flag
+
+                    // 禁用默认点击行为
+                    e.preventDefault();  // 防止触发其他事件
+
+                    // 绑定 mousemove 和 mouseup 事件
+                    document.addEventListener('mousemove', mouseMove);
+                    document.addEventListener('mouseup', mouseUp);
+                }
+            });
+
+            function mouseMove(e) {
+                if (isClicking) {
+                    logger("mouseMove isClicking");
+                    let distanceX = Math.abs(e.clientX - offsetX - element.getBoundingClientRect().left);
+                    let distanceY = Math.abs(e.clientY - offsetY - element.getBoundingClientRect().top);
+
+                    // 如果鼠标移动超过安全距离，开始判定为拖动 If mouse moved past safety distance, consider it a drag
+                    if (distanceX > safetyDistance || distanceY > safetyDistance) {
+                        isDragging = true;
+                        isClicking = false;  // 取消点击事件
+
+                        element.style.position = 'absolute';  // 设置为绝对定位，使元素可以自由移动
+                        element.style.zIndex = 1000;  // 提升元素层级
+                    }
+                }
+
+                if (isDragging) {
+                    logger("mouseMove isDragging");
+                    let x = e.clientX - offsetX;
+                    let y = e.clientY - offsetY;
+
+                    // 限制拖动范围在屏幕内 Restrict dragging within screen
+                    x = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, x));
+                    y = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, y));
+
+                    element.style.left = `${x}px`;
+                    element.style.top = `${y}px`;
+                }
+            }
+
+            function mouseUp(e) {
+                if (isDragging) {
+                    logger("mouseUp isDragging");
+                    let finalX = e.clientX - offsetX;
+                    let finalY = e.clientY - offsetY;
+
+                    finalX = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, finalX));
+                    finalY = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, finalY));
+
+                    element.style.left = `${finalX}px`;
+                    element.style.top = `${finalY}px`;
+
+                    element.style.zIndex = '';  // 恢复层级
+
+                    isClicking = false;  // Prevent click after drag
+                    isDragging = false;  // Reset dragging flag
+
+                    // 移除 mousemove 和 mouseup 监听
+                    document.removeEventListener('mousemove', mouseMove);
+                    document.removeEventListener('mouseup', mouseUp);
+                }
+            }
+
+            // 绑定点击事件
+            element.addEventListener('click', function () {
+                if (isClicking) {
+                    logger('Clicked!');
+                    // 执行点击事件
+                    onBackHome();  // 执行 onBackHome 函数
+
+                    isClicking = false;  // Prevent click after drag
+                    isDragging = false;  // Reset dragging flag
+
+                    // 绑定 mousemove 和 mouseup 事件
+                    document.addEventListener('mousemove', mouseMove);
+                    document.addEventListener('mouseup', mouseUp);
+                }
+            });
+        }
+
+        // 移动端按钮移动事件
+        function makeDraggableMobile(element) {
+            let offsetX = 0, offsetY = 0, isDragging = false;
+            let isClicking = false;  // 用于判断是否为点击操作
+            const safetyDistance = 10; // 安全距离，单位为像素
+            let startX = 0, startY = 0; // 记录触摸开始的位置
+
+            // 监听触摸开始事件
+            element.addEventListener('touchstart', function (e) {
+                if (e.touches.length === 1) {  // 确保只有一个触摸点
+                    logger("touchstart");
+                    //e.preventDefault();  // 阻止默认行为
+                    isDragging = false;  // 初始为不拖动
+                    isClicking = true;  // 假设是点击操作
+                    const touch = e.touches[0];
+                    startX = touch.clientX;
+                    startY = touch.clientY;
+                    offsetX = touch.clientX - element.getBoundingClientRect().left;
+                    offsetY = touch.clientY - element.getBoundingClientRect().top;
+                    element.style.zIndex = 10000;  // 提升z-index
+                }
+            });
+
+            // 监听触摸移动事件
+            document.addEventListener('touchmove', function (e) {
+                if (e.touches.length === 1) {  // 只处理单个触摸点
+                    const touch = e.touches[0];
+                    const deltaX = touch.clientX - startX;
+                    const deltaY = touch.clientY - startY;
+
+                    // 如果触摸移动的距离超过安全距离，则开始拖动
+                    if (Math.abs(deltaX) > safetyDistance || Math.abs(deltaY) > safetyDistance) {
+                        if (!isDragging) {
+                            isDragging = true;
+                            isClicking = false;  // 取消点击事件
+                        }
+                    }
+
+                    // 处理拖动
+                    if (isDragging) {
+                        logger("touchmove isDragging");
+                        //e.preventDefault();  // 阻止滚动
+                        let x = touch.clientX - offsetX;
+                        let y = touch.clientY - offsetY;
+
+                        // 限制拖动范围在屏幕内
+                        x = Math.max(0, Math.min(window.innerWidth - element.clientWidth, x));
+                        y = Math.max(0, Math.min(window.innerHeight - element.clientHeight, y));
+
+                        element.style.left = x + 'px';
+                        element.style.top = y + 'px';
+                    }
+                }
+            }, { passive: false });// 设置 passive: false，防止出现错误 :Unable to preventDefault inside passive event listener due to target being treated as passive.
+
+            // 监听触摸结束事件
+            document.addEventListener('touchend', function () {
+                if (isDragging) {
+                    logger("touchend isDragging");
+                    element.style.zIndex = 9000; // 恢复z-index
+                    isDragging = false;  // 结束拖动
+                }
+            });
+
+            // 监听触摸取消事件（有时触摸事件可能被中断）
+            document.addEventListener('touchcancel', function () {
+                if (isDragging) {
+                    logger("touchcancel isDragging");
+                    element.style.zIndex = 9000; // 恢复z-index
+                    isDragging = false;  // 结束拖动
+                }
+            });
+
+            // 监听点击事件（防止拖动时点击）
+            element.addEventListener('click', function () {
+                if (isClicking) {
+                    logger('Clicked!');
+                    // 执行点击事件
+                    onBackHome();  // 执行 onBackHome 函数
+                }
+            });
+        }
+
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            // Show mobile-specific image, hide the desktop one
+            document.getElementById("img-home-iframe-phone").style.display = "block";
+            document.getElementById("img-home-iframe").style.display = "none";
+            // 应用拖动功能到图片
+            makeDraggableMobile(document.getElementById("img-home-iframe-phone"));
+        } else {
+            // Show desktop-specific image, hide the mobile one
+            document.getElementById("img-home-iframe-phone").style.display = "none";
+            document.getElementById("img-home-iframe").style.display = "block";
+            // 应用拖动功能到图片
+            makeDraggable(document.getElementById("img-home-iframe"));
+        }
+
+        // Function to get query parameter by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function loadIframe(url) {
+            console.log("Loading iframe with URL:", url);
+            loadIframeWithParams(url);
+        }
+
+        // load iframe
+        function loadIframeWithParams(url) {
+            try {
+                let iframe = document.createElement('iframe');
+                iframe.src = url;
+                iframe.id = 'myIframe';
+                iframe.width = '100%';
+                iframe.style.border = 'none'; // 可选：移除iframe边框
+                iframe.style.position = 'absolute';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
+                iframe.style.height = `${window.innerHeight}px`; // 设置初始高度为窗口高度
+                iframe.style.backgroundColor = '#000000'; // 黑色背景
+                // 添加监听器以在窗口大小变化时调整iframe高度
+                window.addEventListener('resize', function () { iframe.style.height = `${window.innerHeight}px`; });
+                document.body.appendChild(iframe);
+            } catch (error) {
+                console.error('Error creating or appending iframe:', error);
+            }
+        }
+
+        // close iframe
+        function closeIframe() {
+            let iframeWeb = document.getElementById('myIframe');
+            if (iframeWeb) {
+                iframeWeb.remove();
+                iframeWeb = null;
+            }
+        }
+
+        // 获取 homeUrl 参数
+        const enterType = getQueryParam('enterType');
+        const homeUrl = getQueryParam('homeUrl');
+
+        // 示例的返回方法，可以在此执行 onClick
+        function onBackHome() {
+            console.log(" click back lobby button");
+            if (enterType && enterType == 1) {
+                logger(" onBackHome :" + enterType + "  homeUrl: " + homeUrl);
+                window.open(homeUrl, '_self');
+            }
+            else{
+                const event = { message: 'returnHall' };
+                window.parent.postMessage(event, '*'); // '*' 表示允许所有来源
+                logger(" onBackHome  returnHall ");
+            }
+           
+            closeIframe();
+        }
+
+        // 获取 URL 参数并加载 iframe
+        const urlParam = getQueryParam('url');
+        if (urlParam) {
+            loadIframe(urlParam);
+        }
+
+        function logger(log) {
+            if (true) {
+                console.log(log);
+            }
+        }
+        // test code : 
+        //loadIframe("http://192.168.6.228:8038/?isEncrypt=true&member_account=sss122&member_password=qqq111&game_id=10102&game_guest=false&server_url=http%3A%2F%2F192.168.6.128:9001");
+    </script>
+</body>
+</html>
