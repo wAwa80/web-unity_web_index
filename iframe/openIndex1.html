@@ -104,14 +104,14 @@
         function makeDraggable(element) {
             let offsetX = 0, offsetY = 0;
             let isDragging = false;
-            let isClicking = true;  // 用于判断是否为点击操作
+            let isClicking = false;  // 用于判断是否为点击操作
             const safetyDistance = 10; // 安全距离，单位为像素
 
             element.addEventListener('mousedown', function (e) {
                 if (e.button === 0) {  // 确保是鼠标左键按下
                     logger("mousedown");
-                    offsetX = e.clientX - element.getBoundingClientRect().left;
-                    offsetY = e.clientY - element.getBoundingClientRect().top;
+                    offsetX = e.clientX - element.offsetLeft;
+                    offsetY = e.clientY - element.offsetTop;
                     isClicking = true;  // 假设是点击操作 Assume it's a click initially
                     isDragging = false;  // Reset dragging flag
 
@@ -127,8 +127,8 @@
             function mouseMove(e) {
                 if (isClicking) {
                     logger("mouseMove isClicking");
-                    let distanceX = Math.abs(e.clientX - offsetX - element.getBoundingClientRect().left);
-                    let distanceY = Math.abs(e.clientY - offsetY - element.getBoundingClientRect().top);
+                    let distanceX = Math.abs(e.clientX - offsetX - element.offsetLeft);
+                    let distanceY = Math.abs(e.clientY - offsetY - element.offsetTop);
 
                     // 如果鼠标移动超过安全距离，开始判定为拖动 If mouse moved past safety distance, consider it a drag
                     if (distanceX > safetyDistance || distanceY > safetyDistance) {
@@ -191,6 +191,15 @@
                     document.addEventListener('mousemove', mouseMove);
                     document.addEventListener('mouseup', mouseUp);
                 }
+            });
+
+            // 绑定点击事件
+            element.addEventListener('mouseleave', function () {
+                logger('mouseleave!');
+                isClicking = false;  // Prevent click after drag
+                isDragging = false;  // Reset dragging flag
+                document.addEventListener('mousemove', mouseMove);
+                document.addEventListener('mouseup', mouseUp);
             });
         }
 
@@ -258,14 +267,14 @@
                 }
             });
 
-            // 监听触摸取消事件（有时触摸事件可能被中断）
-            document.addEventListener('touchcancel', function () {
-                if (isDragging) {
-                    logger("touchcancel isDragging");
-                    element.style.zIndex = 9000; // 恢复z-index
-                    isDragging = false;  // 结束拖动
-                }
-            });
+            //// 监听触摸取消事件（有时触摸事件可能被中断）
+            //document.addEventListener('touchcancel', function () {
+            //    if (isDragging) {
+            //        logger("touchcancel isDragging");
+            //        element.style.zIndex = 9000; // 恢复z-index
+            //        isDragging = false;  // 结束拖动
+            //    }
+            //});
 
             // 监听点击事件（防止拖动时点击）
             element.addEventListener('click', function () {
