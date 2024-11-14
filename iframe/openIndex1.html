@@ -103,7 +103,7 @@
         function makeDraggable(element) {
             let offsetX = 0, offsetY = 0;
             let isDragging = false;
-            let isClicking = false;  // Used to determine whether it's a click operation
+            let isClicking = false;    // Used to determine whether it's a click operation
             const safetyDistance = 10; // Safety distance in pixels
 
             element.addEventListener('mousedown', function (e) {
@@ -145,8 +145,8 @@
                     let y = e.clientY - offsetY;
 
                     // Restrict dragging within the screen
-                    x = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, x));
-                    y = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, y));
+                    //x = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, x));
+                    //y = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, y));
 
                     element.style.left = `${x}px`;
                     element.style.top = `${y}px`;
@@ -193,13 +193,13 @@
             });
 
             // Bind mouseleave event
-            element.addEventListener('mouseleave', function () {
-                logger('mouseleave!');
-                isClicking = false;  // Prevent click after drag
-                isDragging = false;  // Reset dragging flag
-                document.addEventListener('mousemove', mouseMove);
-                document.addEventListener('mouseup', mouseUp);
-            });
+            //element.addEventListener('mouseleave', function () {
+            //    logger('mouseleave!');
+            //    isClicking = false;  // Prevent click after drag
+            //    isDragging = false;  // Reset dragging flag
+            //    document.addEventListener('mousemove', mouseMove);
+            //    document.addEventListener('mouseup', mouseUp);
+            //});
         }
 
 
@@ -229,15 +229,17 @@
             // Listen for touchmove event
             document.addEventListener('touchmove', function (e) {
                 if (e.touches.length === 1) {  // Only handle single touch point
-                    const touch = e.touches[0];
-                    const deltaX = touch.clientX - startX;
-                    const deltaY = touch.clientY - startY;
+                    if (isClicking) {
+                        const touch = e.touches[0];
+                        const deltaX = touch.clientX - startX;
+                        const deltaY = touch.clientY - startY;
 
-                    // If the touch movement exceeds safety distance, start dragging
-                    if (Math.abs(deltaX) > safetyDistance || Math.abs(deltaY) > safetyDistance) {
-                        if (!isDragging) {
-                            isDragging = true;
-                            isClicking = false;  // Cancel click event
+                        // If the touch movement exceeds safety distance, start dragging
+                        if (Math.abs(deltaX) > safetyDistance || Math.abs(deltaY) > safetyDistance) {
+                            if (!isDragging) {
+                                isDragging = true;
+                                isClicking = false;  // Cancel click event
+                            }
                         }
                     }
 
@@ -367,7 +369,7 @@
         }
 
         function logger(log) {
-            if (false) {
+            if (true) {
                 console.log(log);
             }
         }
