@@ -69,14 +69,10 @@
                 max-height: 50%;
             }*/
 
-        #img-home-iframe {
+        #img-home-iframe, img-home-iframe-phone {
             top: 1%;
             left: 1%;
-        }
-
-        #img-home-iframe-phone {
-            top: 1%;
-            left: 1%;
+            display: none;
         }
 
         /* Remove default style when button is clicked */
@@ -135,21 +131,24 @@
                         isClicking = false;  // Cancel click event
 
                         element.style.position = 'absolute';  // Set to absolute positioning so the element can move freely
-                        element.style.zIndex = 1000;  // Bring element to the front
+                        element.style.zIndex = 10000;  // Bring element to the front
                     }
                 }
 
                 if (isDragging) {
                     logger("mouseMove isDragging");
-                    let x = e.clientX - offsetX;
-                    let y = e.clientY - offsetY;
 
-                    // Restrict dragging within the screen
-                    //x = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, x));
-                    //y = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, y));
+                    // Use requestAnimationFrame for smoother performance
+                   
+                        let x = e.clientX - offsetX;
+                        let y = e.clientY - offsetY;
 
-                    element.style.left = `${x}px`;
-                    element.style.top = `${y}px`;
+                        // Restrict dragging within the screen
+                        //x = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, x));
+                        //y = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, y));
+
+                        element.style.left = `${x}px`;
+                        element.style.top = `${y}px`;
                 }
             }
 
@@ -165,7 +164,7 @@
                     element.style.left = `${finalX}px`;
                     element.style.top = `${finalY}px`;
 
-                    element.style.zIndex = '';  // Restore z-index
+                    element.style.zIndex = 10000;  // Restore z-index
 
                     isClicking = false;  // Prevent click after drag
                     isDragging = false;  // Reset dragging flag
@@ -187,18 +186,25 @@
                     isDragging = false;  // Reset dragging flag
 
                     // Bind mousemove and mouseup events
-                    document.addEventListener('mousemove', mouseMove);
-                    document.addEventListener('mouseup', mouseUp);
+                    document.removeEventListener('mousemove', mouseMove);
+                    document.removeEventListener('mouseup', mouseUp);
                 }
             });
 
             // Bind mouseleave event
-            //element.addEventListener('mouseleave', function () {
+            //element.addEventListener('mouseleave', function (e) {
             //    logger('mouseleave!');
-            //    isClicking = false;  // Prevent click after drag
-            //    isDragging = false;  // Reset dragging flag
-            //    document.addEventListener('mousemove', mouseMove);
-            //    document.addEventListener('mouseup', mouseUp);
+
+            //    let x = e.clientX - offsetX;
+            //    let y = e.clientY - offsetY;
+
+            //    element.style.left = `${x}px`;
+            //    element.style.top = `${y}px`;
+
+            //    //isClicking = false;  // Prevent click after drag
+            //    //isDragging = false;  // Reset dragging flag
+            //    //document.removeEventListener('mousemove', mouseMove);
+            //    //document.removeEventListener('mouseup', mouseUp);
             //});
         }
 
@@ -247,6 +253,7 @@
                     if (isDragging) {
                         logger("touchmove isDragging");
                         //e.preventDefault();  // Prevent scrolling
+                        const touch = e.touches[0];
                         let x = touch.clientX - offsetX;
                         let y = touch.clientY - offsetY;
 
@@ -264,7 +271,7 @@
             document.addEventListener('touchend', function () {
                 if (isDragging) {
                     logger("touchend isDragging");
-                    element.style.zIndex = 9000; // Restore z-index
+                    element.style.zIndex = 10000; // Restore z-index
                     isDragging = false;  // End dragging
                 }
             });
@@ -369,12 +376,12 @@
         }
 
         function logger(log) {
-            if (true) {
+            if (false) {
                 console.log(log);
             }
         }
         // test code : 
-        //loadIframe("http://192.168.6.228:8038/?isEncrypt=true&member_account=sss122&member_password=qqq111&game_id=10102&game_guest=false&server_url=http%3A%2F%2F192.168.6.128:9001");
+        //loadIframe("http://192.168.6.229:8079/?isEncrypt=true&member_account=sss001&member_password=qqq111&game_id=10102&game_guest=false&server_url=http%3A%2F%2F192.168.6.128:9001");
     </script>
 </body>
 </html>
