@@ -30,9 +30,10 @@
             height: 98px;
             cursor: pointer; /* Add mouse pointer style */
             background-image: url('./ui_an_lobby1.png'); /* Set image as background */
-            background-size: cover; /* Ensure the image covers the button */
+            background-size: 98px 98px; /* Ensure the image covers the button */
             background-position: center; /* Center the image */
             border: none; /* Remove button border */
+            transform: scale(1)
         }
 
         .iframe-home-img-phone {
@@ -46,10 +47,11 @@
             height: 55px;
             cursor: pointer; /* Add mouse pointer style */
             background-image: url('./ui_an_lobby1.png'); /* Set image as background */
-            background-size: cover;
+            background-size: 55px 55px;
             background-position: center;
             border: none;
             -webkit-tap-highlight-color: transparent; /* Disable tap highlight effect */
+            transform: scale(1)
         }
 
         /* .button {
@@ -192,20 +194,14 @@
             });
 
             // Bind mouseleave event
-            //element.addEventListener('mouseleave', function (e) {
-            //    logger('mouseleave!');
+            element.addEventListener('mouseleave', function (e) {
+                logger('mouseleave!');
 
-            //    let x = e.clientX - offsetX;
-            //    let y = e.clientY - offsetY;
-
-            //    element.style.left = `${x}px`;
-            //    element.style.top = `${y}px`;
-
-            //    //isClicking = false;  // Prevent click after drag
-            //    //isDragging = false;  // Reset dragging flag
-            //    //document.removeEventListener('mousemove', mouseMove);
-            //    //document.removeEventListener('mouseup', mouseUp);
-            //});
+                isClicking = false;  // Prevent click after drag
+                isDragging = false;  // Reset dragging flag
+                document.removeEventListener('mousemove', mouseMove);
+                document.removeEventListener('mouseup', mouseUp);
+            });
         }
 
 
@@ -381,7 +377,7 @@
             }
         }
         // test code : 
-        //loadIframe("http://192.168.6.229:8079/?isEncrypt=true&member_account=sss001&member_password=qqq111&game_id=10102&game_guest=false&server_url=http%3A%2F%2F192.168.6.128:9001");
+        //loadIframe("https://d1ediceh0gpfke.cloudfront.net?params=56Wzg27uV0pYrPkTMJ%2BrBGAw4Z3m1%2B736o5CamG98Ba0elZ3duOeuyQpvCoe32jpoJ32A0JoRh5wKEoVjwDY4ZKXnlvQomkourRvbPjWkLY%2F582BdH4EQ1ExAxxn0HeNATSwGdWnk%2BHwOR9kgvn5YaBGz7asqoMhYohadyzuSV1lBtPihZqyEAgcPgrCfHTj4lllKvvof6L3mq2Um9m16mtRvHCMfbWk9FBgiiEZG21TlyP34aBGNWLKtgaKimqJejljC2LtWmVvtO7xPWuulFKD6yUotFHgGMshkdFMg2XgdEq%2FfRspeCxTUAoYwbRp");
     </script>
 </body>
 </html>
