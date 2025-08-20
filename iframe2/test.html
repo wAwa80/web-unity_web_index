@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>jjjj.bet</title>
+    <style>
+
+        :root {
+            --scale: 1;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            background-color: black;
+            overflow: hidden; /* Prevent scrollbars from appearing */
+            /*width: 100%;
+            height: 100%;*/
+        }
+
+        .iframe-home-img {
+            z-index: 9000;
+            display: block;
+            position: absolute;
+            top: 1%;
+            left: 1%;
+            background: transparent;
+            width: 98px;
+            height: 98px;
+            cursor: pointer; /* Add mouse pointer style */
+            background-image: url('./ui_an_lobby1.png'); /* Set image as background */
+            background-size: cover; /* Ensure the image covers the button */
+            background-position: center; /* Center the image */
+            border: none; /* Remove button border */
+        }
+
+        .iframe-home-img-phone {
+            z-index: 9000;
+            display: block;
+            position: absolute;
+            top: 1%;
+            left: 1%;
+            background: transparent;
+            width: 55px;
+            height: 55px;
+            cursor: pointer; /* Add mouse pointer style */
+            background-image: url('./ui_an_lobby1.png'); /* Set image as background */
+            background-size: cover;
+            background-position: center;
+            border: none;
+            -webkit-tap-highlight-color: transparent; /* Disable tap highlight effect */
+        }
+
+        /* .button {
+            position: absolute;
+            width: 100px;
+            height: 124px;
+            background: transparent;
+            border: 0;
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .button img {
+                max-width: 50%;
+                max-height: 50%;
+            }*/
+
+        #img-home-iframe, img-home-iframe-phone {
+            top: 1%;
+            left: 1%;
+            display: none;
+        }
+
+        /* Remove default style when button is clicked */
+        button:active, button:focus {
+            outline: none; /* Remove outline when clicked */
+            background-color: transparent; /* Only remove background color, not the background image */
+            box-shadow: none; /* Remove shadow effect */
+        }
+
+        /* 使按钮铺满整个屏幕 */
+        .btn-back-home-on-error {
+            position: fixed; /* 固定在屏幕上 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent; /* 设置为透明 */
+            border: none; /* 移除按钮边框 */
+            display:none;
+        }
+    </style>
+
+
+    <link rel="preload" href="./ui_an_lobby1.png" as="image">
+</head>
+<body>
+    <!--<button id="img-home-iframe" class="iframe-home-img">
+    </button>
+    <button id="img-home-iframe-phone" class="iframe-home-img-phone" />-->
+    <button id="id-back-home-on-error" class="btn-back-home-on-error" onclick="onBackHomeWhenError()" />
+
+
+    <script>
+        var btnBackHomeOnError = document.querySelector('#btn-back-home-on-error');
+        function onBackHomeWhenError() {
+            window.location.href = 'https://example.com';
+        }
+        function activeFullScreenBackHomeBtn() {
+            document.getElementById("id-back-home-on-error").style.display = "block";
+        }
+        activeFullScreenBackHomeBtn();
+        // PC button drag event
+        function makeDraggable(element) {
+            let offsetX = 0, offsetY = 0;
+            let isDragging = false;
+            let isClicking = false;    // Used to determine whether it's a click operation
+            const safetyDistance = 10; // Safety distance in pixels
+
+            element.addEventListener('mousedown', function (e) {
+                if (e.button === 0) {  // Ensure it's the left mouse button
+                    logger("mousedown");
+                    offsetX = e.clientX - element.offsetLeft;
+                    offsetY = e.clientY - element.offsetTop;
+                    isClicking = true;  // Assume it's a click initially
+                    isDragging = false;  // Reset dragging flag
+
+                    // Disable the default click behavior
+                    e.preventDefault();  // Prevent triggering other events
+
+                    // Bind mousemove and mouseup events
+                    document.addEventListener('mousemove', mouseMove);
+                    document.addEventListener('mouseup', mouseUp);
+                }
+            });
+
+            function mouseMove(e) {
+                if (isClicking) {
+                    logger("mouseMove isClicking");
+                    let distanceX = Math.abs(e.clientX - offsetX - element.offsetLeft);
+                    let distanceY = Math.abs(e.clientY - offsetY - element.offsetTop);
+
+                    // If mouse moved past safety distance, start considering it a drag
+                    if (distanceX > safetyDistance || distanceY > safetyDistance) {
+                        isDragging = true;
+                        isClicking = false;  // Cancel click event
+
+                        element.style.position = 'absolute';  // Set to absolute positioning so the element can move freely
+                        element.style.zIndex = 10000;  // Bring element to the front
+                    }
+                }
+
+                if (isDragging) {
+                    logger("mouseMove isDragging");
+
+                    // Use requestAnimationFrame for smoother performance
+
+                    let x = e.clientX - offsetX;
+                    let y = e.clientY - offsetY;
+
+                    // Restrict dragging within the screen
+                    //x = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, x));
+                    //y = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, y));
+
+                    element.style.left = `${x}px`;
+                    element.style.top = `${y}px`;
+                }
+            }
+
+            function mouseUp(e) {
+                if (isDragging) {
+                    logger("mouseUp isDragging");
+                    let finalX = e.clientX - offsetX;
+                    let finalY = e.clientY - offsetY;
+
+                    finalX = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, finalX));
+                    finalY = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, finalY));
+
+                    element.style.left = `${finalX}px`;
+                    element.style.top = `${finalY}px`;
+
+                    element.style.zIndex = 10000;  // Restore z-index
+
+                    isClicking = false;  // Prevent click after drag
+                    isDragging = false;  // Reset dragging flag
+
+                    // Remove mousemove and mouseup event listeners
+                    document.removeEventListener('mousemove', mouseMove);
+                    document.removeEventListener('mouseup', mouseUp);
+                }
+            }
+
+            // Bind click event
+            element.addEventListener('click', function () {
+                if (isClicking) {
+                    logger('Clicked!');
+                    // Execute the click event
+                    onBackHome();  // Execute the onBackHome function
+
+                    isClicking = false;  // Prevent click after drag
+                    isDragging = false;  // Reset dragging flag
+
+                    // Bind mousemove and mouseup events
+                    document.removeEventListener('mousemove', mouseMove);
+                    document.removeEventListener('mouseup', mouseUp);
+                }
+            });
+
+            // Bind mouseleave event
+            element.addEventListener('mouseleave', function (e) {
+                logger('mouseleave!');
+
+                isClicking = false;  // Prevent click after drag
+                isDragging = false;  // Reset dragging flag
+                document.removeEventListener('mousemove', mouseMove);
+                document.removeEventListener('mouseup', mouseUp);
+            });
+        }
+
+
+        // Mobile button drag event
+        function makeDraggableMobile(element) {
+            let offsetX = 0, offsetY = 0, isDragging = false;
+            let isClicking = false;  // Used to determine whether it's a click operation
+            const safetyDistance = 10; // Safety distance in pixels
+            let startX = 0, startY = 0; // Record the starting touch position
+
+            // Listen for touchstart event
+            element.addEventListener('touchstart', function (e) {
+                if (e.touches.length === 1) {  // Ensure only one touch point
+                    logger("touchstart");
+                    //e.preventDefault();  // Prevent default behavior
+                    isDragging = false;  // Initially not dragging
+                    isClicking = true;  // Assume it's a click operation
+                    const touch = e.touches[0];
+                    startX = touch.clientX;
+                    startY = touch.clientY;
+                    offsetX = touch.clientX - element.getBoundingClientRect().left;
+                    offsetY = touch.clientY - element.getBoundingClientRect().top;
+                    element.style.zIndex = 10000;  // Raise z-index
+                }
+            });
+
+            // Listen for touchmove event
+            document.addEventListener('touchmove', function (e) {
+                if (e.touches.length === 1) {  // Only handle single touch point
+                    if (isClicking) {
+                        const touch = e.touches[0];
+                        const deltaX = touch.clientX - startX;
+                        const deltaY = touch.clientY - startY;
+
+                        // If the touch movement exceeds safety distance, start dragging
+                        if (Math.abs(deltaX) > safetyDistance || Math.abs(deltaY) > safetyDistance) {
+                            if (!isDragging) {
+                                isDragging = true;
+                                isClicking = false;  // Cancel click event
+                            }
+                        }
+                    }
+
+                    // Handle dragging
+                    if (isDragging) {
+                        logger("touchmove isDragging");
+                        //e.preventDefault();  // Prevent scrolling
+                        const touch = e.touches[0];
+                        let x = touch.clientX - offsetX;
+                        let y = touch.clientY - offsetY;
+
+                        // Restrict dragging within the screen
+                        x = Math.max(0, Math.min(window.innerWidth - element.clientWidth, x));
+                        y = Math.max(0, Math.min(window.innerHeight - element.clientHeight, y));
+
+                        element.style.left = x + 'px';
+                        element.style.top = y + 'px';
+                    }
+                }
+            }, { passive: false }); // Set passive: false to prevent error: Unable to preventDefault inside passive event listener due to target being treated as passive.
+
+            // Listen for touchend event
+            document.addEventListener('touchend', function () {
+                if (isDragging) {
+                    logger("touchend isDragging");
+                    element.style.zIndex = 10000; // Restore z-index
+                    isDragging = false;  // End dragging
+                }
+            });
+
+            //// Listen for touchcancel event (sometimes touch events might be interrupted)
+            //document.addEventListener('touchcancel', function () {
+            //    if (isDragging) {
+            //        logger("touchcancel isDragging");
+            //        element.style.zIndex = 9000; // Restore z-index
+            //        isDragging = false;  // End dragging
+            //    }
+            //});
+
+            // Listen for click event (to prevent click during drag)
+            element.addEventListener('click', function () {
+                if (isClicking) {
+                    logger('Clicked!');
+                    // Execute click event
+                    onBackHome();  // Execute the onBackHome function
+                }
+            });
+        }
+
+
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            // Show mobile-specific image, hide the desktop one
+            document.getElementById("img-home-iframe-phone").style.display = "block";
+            document.getElementById("img-home-iframe").style.display = "none";
+            makeDraggableMobile(document.getElementById("img-home-iframe-phone"));
+        } else {
+            // Show desktop-specific image, hide the mobile one
+            document.getElementById("img-home-iframe-phone").style.display = "none";
+            document.getElementById("img-home-iframe").style.display = "block";
+            makeDraggable(document.getElementById("img-home-iframe"));
+        }
+
+        // Function to get query parameter by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function loadIframe(url) {
+            console.log("Loading iframe with URL:", url);
+            loadIframeWithParams(url);
+        }
+
+        // load iframe
+        function loadIframeWithParams(url) {
+            try {
+                let iframe = document.createElement('iframe');
+                iframe.src = url;
+                iframe.id = 'myIframe';
+                iframe.width = '100%';
+                iframe.style.border = 'none'; // Optional: Remove iframe border
+                iframe.style.position = 'absolute';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
+                iframe.style.height = `${window.innerHeight}px`; // Set initial height to window height
+                iframe.style.backgroundColor = '#000000'; // Black background
+                // Add event listener to adjust iframe height when window size changes
+                window.addEventListener('resize', function () { iframe.style.height = `${window.innerHeight}px`; });
+                document.body.appendChild(iframe);
+            } catch (error) {
+                console.error('Error creating or appending iframe:', error);
+            }
+        }
+
+        // close iframe
+        function closeIframe() {
+            let iframeWeb = document.getElementById('myIframe');
+            if (iframeWeb) {
+                iframeWeb.remove();
+                iframeWeb = null;
+            }
+        }
+
+        // Get homeUrl parameter
+        const enterType = getQueryParam('enterType');
+        const homeUrl = getQueryParam('homeUrl');
+
+        // Example of a return method, where you can execute onClick
+        function onBackHome() {
+            console.log(" click back lobby button");
+            if (enterType && enterType == 1) {
+                logger(" onBackHome :" + enterType + "  homeUrl: " + homeUrl);
+                window.open(homeUrl, '_self');
+            }
+            else {
+                const event = { message: 'returnHall' };
+                window.parent.postMessage(event, '*'); // '*' means allowing all sources
+                logger(" onBackHome  returnHall ");
+            }
+
+            closeIframe();
+        }
+
+        // Get URL parameter and load iframe
+        const urlParam = getQueryParam('url');
+        if (urlParam) {
+            loadIframe(urlParam);
+        }
+
+        function logger(log) {
+            if (false) {
+                console.log(log);
+            }
+        }
+            // test code :
+            //loadIframe("https://d1ediceh0gpfke.cloudfront.net?params=56Wzg27uV0pYrPkTMJ%2BrBGAw4Z3m1%2B736o5CamG98Ba0elZ3duOeuyQpvCoe32jpoJ32A0JoRh5wKEoVjwDY4ZKXnlvQomkourRvbPjWkLY%2F582BdH4EQ1ExAxxn0HeNATSwGdWnk%2BHwOR9kgvn5YaBGz7asqoMhYohadyzuSV1lBtPihZqyEAgcPgrCfHTj4lllKvvof6L3mq2Um9m16mtRvHCMfbWk9FBgiiEZG21TlyP34aBGNWLKtgaKimqJejljC2LtWmVvtO7xPWuulFKD6yUotFHgGMshkdFMg2XgdEq%2FfRspeCxTUAoYwbRp");
+    </script>
+</body>
+</html>
