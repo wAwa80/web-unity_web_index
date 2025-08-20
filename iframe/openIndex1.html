@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>jjjj.bet</title>
+    <title>JJJJBET</title>
     <style>
 
         :root {
@@ -30,10 +30,9 @@
             height: 98px;
             cursor: pointer; /* Add mouse pointer style */
             background-image: url('./ui_an_lobby1.png'); /* Set image as background */
-            background-size: 98px 98px; /* Ensure the image covers the button */
+            background-size: cover; /* Ensure the image covers the button */
             background-position: center; /* Center the image */
             border: none; /* Remove button border */
-            transform: scale(1)
         }
 
         .iframe-home-img-phone {
@@ -47,11 +46,10 @@
             height: 55px;
             cursor: pointer; /* Add mouse pointer style */
             background-image: url('./ui_an_lobby1.png'); /* Set image as background */
-            background-size: 55px 55px;
+            background-size: cover;
             background-position: center;
             border: none;
             -webkit-tap-highlight-color: transparent; /* Disable tap highlight effect */
-            transform: scale(1)
         }
 
         /* .button {
@@ -304,72 +302,239 @@
             makeDraggable(document.getElementById("img-home-iframe"));
         }
 
-        // Function to get query parameter by name
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
         function loadIframe(url) {
-            console.log("Loading iframe with URL:", url);
+            // console.log("Loading iframe with URL:", url);
             loadIframeWithParams(url);
         }
 
-        // load iframe
+        // Load iframe
         function loadIframeWithParams(url) {
             try {
-                let iframe = document.createElement('iframe');
-                iframe.src = url;
-                iframe.id = 'myIframe';
-                iframe.width = '100%';
-                iframe.style.border = 'none'; // Optional: Remove iframe border
-                iframe.style.position = 'absolute';
-                iframe.style.top = '0';
-                iframe.style.left = '0';
-                iframe.style.height = `${window.innerHeight}px`; // Set initial height to window height
-                iframe.style.backgroundColor = '#000000'; // Black background
-                // Add event listener to adjust iframe height when window size changes
-                window.addEventListener('resize', function () { iframe.style.height = `${window.innerHeight}px`; });
-                document.body.appendChild(iframe);
+              let iframeWeb = document.getElementById('myIframe');
+              if (iframeWeb !== null) {
+                iframeWeb.src = url; // 复用已存在的 iframe
+                iframeWeb.style.display = 'block'; // 显示 iframe
+                return;
+              }
+
+              // 创建新的 iframe
+              let iframe = document.createElement('iframe');
+              iframe.src = url;
+              iframe.id = 'myIframe';
+              iframe.width = '100%';
+              iframe.style.border = 'none';
+              iframe.style.position = 'absolute';
+              iframe.style.top = '0';
+              iframe.style.left = '0';
+              iframe.style.height = `${document.documentElement.clientHeight}px`; // 设置初始高度
+              iframe.style.backgroundColor = '#000000';
+              iframe.style.zIndex = '1000'; // 设置在页面顶层
+
+              // 调整高度事件监听器
+              const resizeHandler = function () {
+                iframe.style.height = `${document.documentElement.clientHeight}px`;
+              };
+              window.addEventListener('resize', resizeHandler);
+
+              // 保存监听器引用，便于清理
+              iframe._resizeHandler = resizeHandler;
+
+              document.body.appendChild(iframe);
             } catch (error) {
-                console.error('Error creating or appending iframe:', error);
+              console.error('Error creating or appending iframe:', error);
             }
         }
 
-        // close iframe
+        // Close iframe
         function closeIframe() {
-            let iframeWeb = document.getElementById('myIframe');
-            if (iframeWeb) {
-                iframeWeb.remove();
-                iframeWeb = null;
+            const iframe = document.getElementById('myIframe');
+            if (!iframe) return;
+
+            try {
+                iframe.onload = null;
+                iframe.onerror = null;
+
+                // 设置 src 为空白页面，开始卸载 iframe 内容
+                iframe.src = 'about:blank';
+
+                // 跨域情况下无法访问 iframe 内容
+                const doc = iframe.contentWindow?.document;
+                if (doc) {
+                    doc.open();
+                    doc.write('');
+                    doc.close();
+                }
+            } catch (e) {
+                console.warn('跨域 iframe，跳过内容清除');
             }
+
+            // 确保 iframe 的内容清空后再移除
+            iframe.remove(); // 在加载完后移除
+        }
+
+        // Function to get query parameter by name
+        function getQueryParam(name, url = window.location.search) {
+            const urlParams = new URLSearchParams(url);
+            return urlParams.get(name);
         }
 
         // Get homeUrl parameter
-        const enterType = getQueryParam('enterType');
-        const homeUrl = getQueryParam('homeUrl');
+        let enterType = getQueryParam('enterType');
+        let homeUrl = getQueryParam('homeUrl');
+        let urlParam = getQueryParam('url');
+
+        if(urlParam && urlParam != ''){
+            loadIframe(urlParam);
+        }
+
+        window.addEventListener("message", function(event) {
+            const { data } = event;
+            
+            // console.log('openIndex1 message ', data);
+
+            if(data.comeFrom && data.comeFrom == 'hall'){
+                let iframeWeb = document.getElementById('myIframe');
+                if (iframeWeb) {
+                    iframeWeb.contentWindow.postMessage(data, "*");
+                }
+            }
+
+            if (data.message === 'openGame') {
+                let _url = data.url
+                enterType = getQueryParam('enterType', _url);
+                homeUrl = getQueryParam('homeUrl', _url);
+                if(!urlParam || urlParam == ''){
+                    urlParam = _url
+                    loadIframe(urlParam);
+                }
+            }
+            else if (data.message === 'offline') {
+                // console.log('openIndex1 offline data', data);
+                showOfflinePopup(data.showText)
+            }
+            else if (data.message === 'closeOffline') {
+                // console.log('close offline ');
+                removeOfflinePopup();
+            }
+            else if (data.message === 'backToHome') {
+                onBackHome();
+            }
+        });
 
         // Example of a return method, where you can execute onClick
         function onBackHome() {
-            console.log(" click back lobby button");
-            if (enterType && enterType == 1) {
-                logger(" onBackHome :" + enterType + "  homeUrl: " + homeUrl);
-                window.open(homeUrl, '_self');
-            }
-            else {
-                const event = { message: 'returnHall' };
-                window.parent.postMessage(event, '*'); // '*' means allowing all sources
-                logger(" onBackHome  returnHall ");
+            // console.log(" click back lobby button");
+            
+
+            let iframeWeb = document.getElementById('myIframe');
+            // 通知 iframe 内部可能嵌套的子页面（如果 openIndex1.html 自己也是 iframe）
+            if (iframeWeb && iframeWeb.contentWindow) {
+                console.log("cleaar iframe memory postMessage onBackHome");                
+                iframeWeb.contentWindow.postMessage({ message: 'onBackHome' }, '*');
             }
 
-            closeIframe();
+            setTimeout(()=>{
+                if (enterType && enterType == 1) {
+                    logger(" onBackHome :" + enterType + "  homeUrl: " + homeUrl);
+                    window.open(homeUrl, '_self');
+                }
+                else {
+                    const event = { message: 'returnHall' };
+                    window.parent.postMessage(event, '*'); // '*' means allowing all sources
+                    logger(" onBackHome  returnHall ");
+                }
+                urlParam = null
+
+                closeIframe();
+
+            }, 500)
         }
 
-        // Get URL parameter and load iframe
-        const urlParam = getQueryParam('url');
-        if (urlParam) {
-            loadIframe(urlParam);
+        function showOfflinePopup(showText) {
+            // 检查是否已存在弹窗，避免重复创建
+            if (document.getElementById('offline-popup-overlay')) return;
+            
+            showText = showText || "A conexão com a internet foi perdida,Por favor, tente novamente.";
+
+            // 创建遮罩
+            const overlay = document.createElement('div');
+            overlay.id = 'offline-popup-overlay'; // 设置唯一 ID
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100vw';
+            overlay.style.height = '100vh';
+            overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            overlay.style.zIndex = '9999';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            document.body.appendChild(overlay);
+
+            // 创建弹窗容器
+            const popup = document.createElement('div');
+            popup.style.position = 'relative';
+            popup.style.width = '370px';
+            popup.style.height = '160px';
+            popup.style.borderStyle = 'solid';
+            popup.style.borderWidth = '3px';
+            popup.style.borderImage = 'url("./dg_dt_db2.png") 15 stretch';
+            popup.style.backgroundColor = '#1b1b1b';
+            popup.style.display = 'flex';
+            popup.style.flexDirection = 'column';
+            popup.style.alignItems = 'center';
+            popup.style.padding = '15px';
+            popup.style.borderRadius = '6px';
+            overlay.appendChild(popup);
+
+            // 添加标题
+            const title = document.createElement('div');
+            title.innerText = 'Lembrete';
+            title.style.fontSize = '28px';
+            title.style.color = '#C7C7C7';
+            title.style.marginBottom = '8px';
+            popup.appendChild(title);
+
+            // 添加内容
+            const content = document.createElement('div');
+            content.innerText = showText
+            content.style.fontSize = '14px';
+            content.style.color = '#C7C7C7';
+            content.style.lineHeight = '20px';
+            content.style.width = '370px';
+            content.style.textAlign = 'center';
+            content.style.wordWrap = 'break-word';
+            popup.appendChild(content);
+
+            // 添加按钮
+            const button = document.createElement('button');
+            button.innerText = 'OK';
+            button.style.width = '370px';
+            button.style.height = '35px';
+            button.style.marginTop = '12px';
+            button.style.borderStyle = 'solid';
+            button.style.borderWidth = '0px';
+            button.style.borderImage = 'url("./dg_an_1_1.png") 10 stretch';
+            button.style.color = '#000000';
+            button.style.fontSize = '18px';
+            button.style.border = 'none';
+            button.style.borderRadius = '6px';
+            button.style.cursor = 'pointer';
+            button.style.backgroundColor = '#eebc52';
+            button.onclick = () => {
+                removeOfflinePopup();
+                onBackHome();
+            };
+            popup.appendChild(button);
         }
+
+        function removeOfflinePopup() {
+            const overlay = document.getElementById('offline-popup-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
 
         function logger(log) {
             if (false) {
@@ -377,7 +542,7 @@
             }
         }
         // test code : 
-        //loadIframe("https://d1ediceh0gpfke.cloudfront.net?params=56Wzg27uV0pYrPkTMJ%2BrBGAw4Z3m1%2B736o5CamG98Ba0elZ3duOeuyQpvCoe32jpoJ32A0JoRh5wKEoVjwDY4ZKXnlvQomkourRvbPjWkLY%2F582BdH4EQ1ExAxxn0HeNATSwGdWnk%2BHwOR9kgvn5YaBGz7asqoMhYohadyzuSV1lBtPihZqyEAgcPgrCfHTj4lllKvvof6L3mq2Um9m16mtRvHCMfbWk9FBgiiEZG21TlyP34aBGNWLKtgaKimqJejljC2LtWmVvtO7xPWuulFKD6yUotFHgGMshkdFMg2XgdEq%2FfRspeCxTUAoYwbRp");
+        //loadIframe("http://192.168.6.229:8079/?isEncrypt=true&member_account=sss001&member_password=qqq111&game_id=10102&game_guest=false&server_url=http%3A%2F%2F192.168.6.128:9001");
     </script>
 </body>
 </html>
