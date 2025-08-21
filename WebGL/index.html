@@ -252,7 +252,7 @@
         factoryId = JsGetUrlParam("game_factory_id");
 
         async function init() {
-            await gameDataReady; // 等待数据加载完成
+            await gameDataReady(factoryId); // 等待数据加载完成
 
             gameInfo = getGameInfo(gameId)
             console.log("gameInfo : " + gameInfo + "  gameId : " + gameId + " version : " + gameInfo.game_version);

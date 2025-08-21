@@ -2,9 +2,9 @@
 let gameMap = new Map();
 
 // 加载游戏数据
-async function loadGameData() {
+async function loadGameData(factoryId) {
     try {
-        const response = await fetch('./TemplateData/gameJson.json', { cache: "no-store" });
+        const response = await fetch(`./TemplateData/gameFactory${factoryId}Json.json`, { cache: "no-store" });
 
         if (!response.ok) {
             throw new Error(`game data load fail : ${response.status} ${response.statusText}`);
@@ -42,5 +42,5 @@ function getGameInfo(gameId) {
     return gameMap.get(gameId) || null;
 }
 
-window.gameDataReady = loadGameData();
+window.gameDataReady = loadGameData;
 window.getGameInfo = getGameInfo;
